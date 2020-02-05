@@ -7,6 +7,8 @@ const MongoClient = require('mongodb').MongoClient
 app.use(bodyParser.urlencoded({extended: true}))
 //renderização
 app.set('view-engine', 'ejs')
+app.use(express.static('public'))
+app.use(bodyParser.json())
 
 var db
 
@@ -36,11 +38,22 @@ app.post('/quotes', (req, res) => {
     })
 })
 
-// app.get('/', (req, res) => {
-//   db.collection('quotes').find().toArray((err, result) => {
-//     if (err) return console.log(err)
-//     // renders index.ejs
-//     //res.sendFile(__dirname + '/index.html')
-//     res.render('index.ejs', {quotes: result})
-//   })
-// })
+app.put('/', (req,res)=>{
+  //handle put request
+})
+
+app.put('/quotes', (req, res) => {
+  db.collection('quotes')
+  .findOneAndUpdate({name: 'Yoda'}, {
+    $set: {
+      name: req.body.name,
+      quote: req.body.quote
+    }
+  }, {
+    sort: {_id: -1},
+    upsert: true
+  }, (err, result) => {
+    if (err) return res.send(err)
+    res.send(result)
+  })
+})
